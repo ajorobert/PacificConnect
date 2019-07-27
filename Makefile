@@ -10,7 +10,7 @@ OBJECTS=$(patsubst %.cc,%.o,$(SOURCES))
 DEPENDS = $(patsubst %.cc,%.d,$(SOURCES))
 
 CPPFLAGS = -std=c++11 -g -Wall
-LDFLAGS = 
+LDFLAGS = -lboost_system
 
 .PHONY: all clean
 all: $(TARGET)
