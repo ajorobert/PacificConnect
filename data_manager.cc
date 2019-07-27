@@ -10,16 +10,16 @@
 #include <boost/property_tree/json_parser.hpp>
 
 char* DataManager::StartOfData(char *ptr) {
-	if (!ptr) return nullptr;
+	if (!ptr) return NULL;
 	while((*ptr) &&(isspace(*ptr) || (*ptr == ':'))) ptr++;
-	if (*ptr == 0) return nullptr;
+	if (*ptr == 0) return NULL;
 	return ptr;
 }
 
 char* DataManager::EndOfData(char *ptr) {
-	if (!ptr) return nullptr;
+	if (!ptr) return NULL;
 	while((*ptr) && (*ptr != ':') && (*ptr != '\n')) ptr++;
-	if (*ptr == 0) return nullptr;
+	if (*ptr == 0) return NULL;
 	ptr--;
 	while(isspace(*ptr)) ptr--;
 	ptr++;
@@ -53,7 +53,6 @@ int DataManager::ReadTupple(char **ptr) {
 }
 
 int DataManager::ReadRecord() {
-	std::lock_guard<std::mutex> guard(tp_data_mutex_);
 	tp_data_.clear();
 	interface_.ReadBlock();
 	char *data = interface_.GetData();
@@ -71,7 +70,6 @@ int DataManager::ReadRecord() {
 }
 
 int DataManager::PrintRecord() {
-	std::lock_guard<std::mutex> guard(tp_data_mutex_);
 	std::cout << json_data_ << std::endl;
 	return 0;
 }

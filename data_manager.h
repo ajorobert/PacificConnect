@@ -9,16 +9,14 @@
 #define DATA_MANAGER_H_
 
 #include "serial_interface.h"
-#include <tuple>
 #include <boost/property_tree/ptree.hpp>
-#include <mutex>
 
 namespace PT = boost::property_tree;
 
 class DataManager {
 public:
 	DataManager(SerialInterface &interface):
-		interface_(interface) {}
+		json_data_(""), interface_(interface) {}
 
 public:
 	int PrintRecord();
@@ -33,7 +31,6 @@ protected:
 	PT::ptree tp_data_;
 	std::string json_data_;
 	SerialInterface &interface_;
-	std::mutex tp_data_mutex_;
 };
 
 #endif /* DATA_MANAGER_H_ */

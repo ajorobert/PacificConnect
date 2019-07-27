@@ -9,7 +9,8 @@
 #include <iostream>
 
 SerialInterface::SerialInterface(std::string end_point, int baud_rate):
-					end_point_(end_point) {
+					end_point_(end_point), port_(io_),
+					data_len_ (0), read_buff_valid_(false) {
 	std::cout << "Opening port: " << end_point << std::endl;
 
 	/* Configure the serial interface for reading. */
@@ -34,7 +35,7 @@ int SerialInterface::ReadInterface() {
 int SerialInterface::ReadBlock(const char *start, const char *end) {
 	data_len_ = 0;
 	int len;
-	char *start_ptr = nullptr;
+	char *start_ptr = NULL;
 	/* Check for start element, continue read if not found. */
 	if (read_buff_valid_)
 		start_ptr = std::strstr(read_buff_, start);
@@ -50,7 +51,7 @@ int SerialInterface::ReadBlock(const char *start, const char *end) {
 	data_len_ += len;
 
 	/* Read until end element appears. */
-	char *end_ptr = nullptr;
+	char *end_ptr = NULL;
 	while (!end_ptr) {
 		len = ReadInterface();
 		end_ptr = std::strstr(read_buff_, end);

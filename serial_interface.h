@@ -29,11 +29,11 @@ public:
 protected:
 	std::string end_point_;
     asio::io_service io_;
-    asio::serial_port port_{io_};
+    asio::serial_port port_;
 	char read_buff_[11];
 	char data_buff_[256];
-	int data_len_ {0};
-	bool read_buff_valid_ {false};
+	int data_len_;
+	bool read_buff_valid_;
 };
 
 #endif /* SERIAL_INTERFACE_H_ */
