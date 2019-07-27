@@ -10,6 +10,7 @@
 
 #include "serial_interface.h"
 #include <boost/property_tree/ptree.hpp>
+#include <boost/thread.hpp>
 
 namespace PT = boost::property_tree;
 
@@ -31,6 +32,7 @@ protected:
 	PT::ptree tp_data_;
 	std::string json_data_;
 	SerialInterface &interface_;
+	boost::mutex json_data_mutex_;
 };
 
 #endif /* DATA_MANAGER_H_ */

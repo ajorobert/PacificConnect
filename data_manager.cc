@@ -45,8 +45,6 @@ int DataManager::ReadTupple(char **ptr) {
 	/* Error on partial data. */
 	if (!start || !end) return -1;
 	std::string value(start, end - start);
-
-	//std::cout << key << ":" << value << std::endl;
 	tp_data_.put(key, value);
 	*ptr = end;
 	return 0;
@@ -63,13 +61,18 @@ int DataManager::ReadRecord() {
 	} else {
 		tp_data_.put("VALID", "TRUE");
 	}
+
 	std::stringstream ss;
 	PT::json_parser::write_json(ss, tp_data_);
+	/* Lock the JSON variable and update. */
+	boost::lock_guard<boost::mutex> lock(json_data_mutex_);
 	json_data_ = ss.str();
 	return 0;
 }
 
 int DataManager::PrintRecord() {
+	/* Take lock and print the JSON value. */
+	boost::lock_guard<boost::mutex> lock(json_data_mutex_);
 	std::cout << json_data_ << std::endl;
 	return 0;
 }

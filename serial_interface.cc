@@ -10,7 +10,8 @@
 
 SerialInterface::SerialInterface(std::string end_point, int baud_rate):
 					end_point_(end_point), port_(io_),
-					data_len_ (0), read_buff_valid_(false) {
+					read_len_ (0), data_len_ (0),
+					read_buff_valid_(false) {
 	std::cout << "Opening port: " << end_point << std::endl;
 
 	/* Configure the serial interface for reading. */
@@ -34,32 +35,31 @@ int SerialInterface::ReadInterface() {
 
 int SerialInterface::ReadBlock(const char *start, const char *end) {
 	data_len_ = 0;
-	int len;
 	char *start_ptr = NULL;
 	/* Check for start element, continue read if not found. */
 	if (read_buff_valid_)
 		start_ptr = std::strstr(read_buff_, start);
 	while (!start_ptr) {
-		len = ReadInterface();
+		read_len_ = ReadInterface();
 		start_ptr = std::strstr(read_buff_, start);
 	}
 	++start_ptr;
 
 	/* Copy block data available in this packet. */
-	len = len - (start_ptr - read_buff_);
+	int len = read_len_ - (start_ptr - read_buff_);
 	std::memcpy(data_buff_, start_ptr, len);
 	data_len_ += len;
 
 	/* Read until end element appears. */
 	char *end_ptr = NULL;
 	while (!end_ptr) {
-		len = ReadInterface();
+		read_len_ = ReadInterface();
 		end_ptr = std::strstr(read_buff_, end);
 		if (end_ptr) {
 			break;
 		}
-		std::memcpy(data_buff_ + data_len_, read_buff_, len);
-		data_len_ += len;
+		std::memcpy(data_buff_ + data_len_, read_buff_, read_len_);
+		data_len_ += read_len_;
 	}
 
 	/* Read till the end element in the last read buffer. */

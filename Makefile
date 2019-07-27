@@ -10,7 +10,7 @@ OBJECTS=$(patsubst %.cc,%.o,$(SOURCES))
 DEPENDS = $(patsubst %.cc,%.d,$(SOURCES))
 
 CPPFLAGS = -g -Wall
-LDFLAGS = -lboost_system
+LDFLAGS = -lboost_system -lboost_thread
 
 .PHONY: all clean
 all: $(TARGET)

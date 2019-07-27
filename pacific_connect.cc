@@ -11,12 +11,29 @@
 #include <boost/thread.hpp>
 
 static DataManager *manager;
+#define	TIMER_DRIFT_CORRECTION_LOOP 6
 
 void DisplayTimer() {
+	boost::posix_time::ptime timeLocal = boost::posix_time::second_clock::local_time();
+	int counter = TIMER_DRIFT_CORRECTION_LOOP;
+
+	/* Findout the time needed to hit a 10 Second boundary. */
+	int remaining = 10 - (timeLocal.time_of_day().seconds() % 10);
+	sleep (remaining);
 	while (1) {
-		std::cout << "Printing from TImer thread." << std::endl;
 		manager->PrintRecord();
-		sleep(5);
+		--counter;
+		if (counter == 0) {
+			/* Adjust the timer. */
+			boost::posix_time::ptime timeLocal = boost::posix_time::second_clock::local_time();
+			/* Findout the time needed to hit a 10 Second boundary. */
+			remaining = 10 - (timeLocal.time_of_day().seconds() % 10);
+			counter = TIMER_DRIFT_CORRECTION_LOOP;
+		} else {
+			/* Assume we are at 10 second boundary and sleep for another 10s. */
+			remaining = 10;
+		}
+		sleep (remaining);
 	}
 }
 
@@ -32,11 +49,12 @@ int main(int argc, char* argv[]) {
 		return -1;
 	}
 
-	//boost::thread timer = boost::thread(DisplayTimer);
+	boost::thread timer = boost::thread(DisplayTimer);
 	while (manager->ReadRecord() == 0) {
-		manager->PrintRecord();
+		//manager->PrintRecord();
 	}
-	//timer.join();
+	timer.join();
+
 	return 0;
 }
 

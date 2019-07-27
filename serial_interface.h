@@ -31,6 +31,7 @@ protected:
     asio::io_service io_;
     asio::serial_port port_;
 	char read_buff_[11];
+	int read_len_;
 	char data_buff_[256];
 	int data_len_;
 	bool read_buff_valid_;
