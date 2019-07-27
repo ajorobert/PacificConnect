@@ -36,6 +36,8 @@ int SerialInterface::ReadBlock(const char *start, const char *end) {
 	int len;
 	char *start_ptr = nullptr;
 	/* Check for start element, continue read if not found. */
+	if (read_buff_valid_)
+		start_ptr = std::strstr(read_buff_, start);
 	while (!start_ptr) {
 		len = ReadInterface();
 		start_ptr = std::strstr(read_buff_, start);
@@ -64,9 +66,6 @@ int SerialInterface::ReadBlock(const char *start, const char *end) {
 	std::memcpy(data_buff_ + data_len_, read_buff_, len);
 	data_len_ += len;
 	data_buff_[data_len_] = 0;
-
-	std::cout << " -------------- Data Start ------------" << std::endl;
-	std::cout << data_buff_;
-	std::cout << std::endl << " -------------- Data End ------------" << std::endl;
-	return 0;
+	read_buff_valid_ = true;
+	return data_len_;
 }

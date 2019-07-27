@@ -21,6 +21,7 @@ public:
 
 public:
 	int ReadBlock(const char *start = "/", const char *end = "\\");
+	char* GetData() { return data_buff_; }
 
 public:
 	int ReadInterface();
@@ -32,6 +33,7 @@ protected:
 	char read_buff_[11];
 	char data_buff_[256];
 	int data_len_ {0};
+	bool read_buff_valid_ {false};
 };
 
 #endif /* SERIAL_INTERFACE_H_ */
