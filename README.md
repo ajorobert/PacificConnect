@@ -31,6 +31,9 @@ Sample application output:
     "VALID": "TRUE"
 }
 
+Dependencies:
+	1. boost library
+
 For testing with a serial simulator:
 socat -d -d pty,raw,echo=0 pty,raw,echo=0
 
