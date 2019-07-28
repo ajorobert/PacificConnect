@@ -80,6 +80,8 @@ int DataManager::ReadRecord() {
 int DataManager::PrintRecord() {
 	/* Take lock and print the JSON value. */
 	boost::lock_guard<boost::mutex> lock(json_data_mutex_);
+	/* If there is no valid data, skip printing empty line. */
+	if (json_data_.length() == 0) return 0;
 	std::cout << json_data_ << std::endl;
 	return 0;
 }

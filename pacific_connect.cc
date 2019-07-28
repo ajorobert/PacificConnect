@@ -13,7 +13,7 @@
 static DataManager *manager;
 #define	TIMER_DRIFT_CORRECTION_LOOP 6
 
-void DisplayTimer() {
+void DisplayLoop() {
 	boost::posix_time::ptime timeLocal = boost::posix_time::second_clock::local_time();
 	int counter = TIMER_DRIFT_CORRECTION_LOOP;
 
@@ -34,7 +34,15 @@ void DisplayTimer() {
 			/* Assume we are at 10 second boundary and sleep for another 10s. */
 			remaining = 10;
 		}
-		sleep (remaining);
+		boost::this_thread::sleep_for(boost::chrono::seconds(remaining));
+	}
+}
+
+void DisplayTimer() {
+	try {
+		DisplayLoop();
+	} catch (...) {
+		return;
 	}
 }
 
@@ -63,6 +71,9 @@ int main(int argc, char* argv[]) {
 	} catch (...) {
 		std::cout << "There is an error while processing stream." << std::endl;
 	}
+
+	/* close the timer loop. */
+	timer.interrupt();
 	timer.join();
 
 	return 0;
