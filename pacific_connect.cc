@@ -23,6 +23,7 @@ void DisplayTimer() {
 	while (1) {
 		manager->PrintRecord();
 		--counter;
+
 		if (counter == 0) {
 			/* Adjust the timer. */
 			boost::posix_time::ptime timeLocal = boost::posix_time::second_clock::local_time();
@@ -39,19 +40,28 @@ void DisplayTimer() {
 
 int main(int argc, char* argv[]) {
 	if (argc != 2) {
-		std::cout << "Invalid use of the application. Please specify the serial interface as an argument." << std::endl;
+		std::cout << "Invalid use of the application. Please specify the serial interface as an argument.";
+		std::cout << std::endl;
 		return -1;
 	}
-	SerialInterface serial(argv[1]);
-	manager = new DataManager(serial);
+	DeviceInterface *device = new SerialInterface(argv[1]);
+	if (!device){
+		std::cout << "Serial interface init failed." << std::endl;
+		return -1;
+	}
+
+	manager = new DataManager(device);
 	if (!manager){
 		std::cout << "Data manager module init failed." << std::endl;
 		return -1;
 	}
 
 	boost::thread timer = boost::thread(DisplayTimer);
-	while (manager->ReadRecord() == 0) {
-		//manager->PrintRecord();
+
+	try {
+		while (manager->ReadRecord() == 0);
+	} catch (...) {
+		std::cout << "There is an error while processing stream." << std::endl;
 	}
 	timer.join();
 

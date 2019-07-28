@@ -8,7 +8,7 @@
 #ifndef DATA_MANAGER_H_
 #define DATA_MANAGER_H_
 
-#include "serial_interface.h"
+#include "device_interface.h"
 #include <boost/property_tree/ptree.hpp>
 #include <boost/thread.hpp>
 
@@ -16,22 +16,64 @@ namespace PT = boost::property_tree;
 
 class DataManager {
 public:
-	DataManager(SerialInterface &interface):
+	DataManager(DeviceInterface *interface):
 		json_data_(""), interface_(interface) {}
 
 public:
+	/*
+	 * Print the last read record to stdout.
+	 *
+	 * @return	0 	on success
+	 * @return	-1	on error
+	 */
 	int PrintRecord();
+
+	/*
+	 * Read a block of data and perform below set of operations.
+	 *  1. Parse the input data
+	 *  2. Create JSON from the result.
+	 *  3. Add valid field to JSON based on above steps.0
+	 *
+	 * @return	0 	on success
+	 * @return	-1	on error
+	 */
 	int ReadRecord();
 
 protected:
+	/*
+	 * Consume the given char stream till start of data is reached.
+	 *
+	 * @param	ptr		Stream pointer.
+	 *
+	 * @return	Start pointer to the valid stream data.
+	 */
 	char* StartOfData(char *ptr);
+
+	/*
+	 * Traverse the given char stream till end of current data block.
+	 *
+	 * @param	ptr		Stream pointer pointing to start of data.
+	 *
+	 * @return	Pointer to end of valid data in the given stream.
+	 */
 	char* EndOfData(char *ptr);
+
+	/*
+	 * Read a next data tuple <name, value> from the given stream.
+	 *
+	 * @param	ptr		Stream pointer.
+	 * 					Stream pointer will be updated to reflect consumed bytes on success.
+	 * 					Stream pointer will be set o NULLPTR on end of stream.
+	 *
+	 * @return	0 	on success
+	 * @return	-1	on error
+	 */
 	int ReadTupple(char **ptr);
 
 protected:
 	PT::ptree tp_data_;
 	std::string json_data_;
-	SerialInterface &interface_;
+	DeviceInterface *interface_;
 	boost::mutex json_data_mutex_;
 };
 

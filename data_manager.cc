@@ -51,23 +51,31 @@ int DataManager::ReadTupple(char **ptr) {
 }
 
 int DataManager::ReadRecord() {
-	tp_data_.clear();
-	interface_.ReadBlock();
-	char *data = interface_.GetData();
-	/* Read until the stream is over or an error. */
-	while ((ReadTupple(&data) == 0) && (data));
-	if (data) {
-		tp_data_.put("VALID", "FALSE");
-	} else {
-		tp_data_.put("VALID", "TRUE");
-	}
+	if (!interface_) return -1;
 
-	std::stringstream ss;
-	PT::json_parser::write_json(ss, tp_data_);
-	/* Lock the JSON variable and update. */
-	boost::lock_guard<boost::mutex> lock(json_data_mutex_);
-	json_data_ = ss.str();
-	return 0;
+	tp_data_.clear();
+	if (interface_->ReadBlock() == 0) return -1;
+	try {
+		char *data = interface_->GetData();
+
+		/* Read until the stream is over or an error. */
+		while ((ReadTupple(&data) == 0) && (data));
+		if (data) {
+			tp_data_.put("VALID", "FALSE");
+		} else {
+			tp_data_.put("VALID", "TRUE");
+		}
+
+		std::stringstream ss;
+		PT::json_parser::write_json(ss, tp_data_);
+		/* Lock the JSON variable and update. */
+		boost::lock_guard<boost::mutex> lock(json_data_mutex_);
+		json_data_ = ss.str();
+
+		return 0;
+	} catch (...) {
+		return -1;
+	}
 }
 
 int DataManager::PrintRecord() {
