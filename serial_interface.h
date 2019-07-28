@@ -9,7 +9,6 @@
 #define SERIAL_INTERFACE_H_
 
 #include <string>
-#include <vector>
 #include <boost/asio/serial_port.hpp>
 #include <boost/asio.hpp>
 #include "device_interface.h"

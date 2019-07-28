@@ -6,7 +6,6 @@
  */
 
 #include "data_manager.h"
-#include <boost/tokenizer.hpp>
 #include <boost/property_tree/json_parser.hpp>
 
 char* DataManager::StartOfData(char *ptr) {
