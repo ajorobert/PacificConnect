@@ -1,4 +1,4 @@
-# Sample App Makefile
+# PacificConnect App Makefile
 #  	Created on: 27/07/2019
 #   Author: Ajo Robert
 #
