@@ -9,10 +9,7 @@
 #define DATA_MANAGER_H_
 
 #include "device_interface.h"
-#include <boost/property_tree/ptree.hpp>
 #include <boost/thread.hpp>
-
-namespace PT = boost::property_tree;
 
 class DataManager {
 public:
@@ -70,8 +67,30 @@ protected:
 	 */
 	int ReadTupple(char **ptr);
 
+	/*
+	 * Add JSON key to the JSON string.
+	 *
+	 * @param	key		JSON Key string.
+	 */
+	void AddJSONKey(std::string key);
+
+	/*
+	 * Add tuple <name, value> to the JSON string.
+	 *
+	 * @param	key		JSON Key string.
+	 * @param	value	JSON string value.
+	 */
+	void AddToJSON(std::string key, std::string value);
+
+	/*
+	 * Add tuple <name, value> to the JSON string.
+	 *
+	 * @param	key		JSON Key string.
+	 * @param	value	JSON boolean value.
+	 */
+	void AddToJSON(std::string key, bool value);
+
 protected:
-	PT::ptree tp_data_;
 	std::string json_data_;
 	DeviceInterface *interface_;
 	boost::mutex json_data_mutex_;

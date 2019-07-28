@@ -6,7 +6,6 @@
  */
 
 #include "data_manager.h"
-#include <boost/property_tree/json_parser.hpp>
 
 char* DataManager::StartOfData(char *ptr) {
 	if (!ptr) return NULL;
@@ -23,6 +22,28 @@ char* DataManager::EndOfData(char *ptr) {
 	while(isspace(*ptr)) ptr--;
 	ptr++;
 	return ptr;
+}
+
+void DataManager::AddJSONKey(std::string key) {
+	if (json_data_.length() > 2) json_data_.append(",");
+	json_data_.append("\n\t\"");
+	json_data_.append(key);
+	json_data_.append("\": ");
+}
+
+void DataManager::AddToJSON(std::string key, std::string value) {
+	AddJSONKey(key);
+	json_data_.append("\"");
+	json_data_.append(value);
+	json_data_.append("\"");
+}
+
+void DataManager::AddToJSON(std::string key, bool value) {
+	AddJSONKey(key);
+	if (value)
+		json_data_.append("true");
+	else
+		json_data_.append("false");
 }
 
 int DataManager::ReadTupple(char **ptr) {
@@ -44,33 +65,30 @@ int DataManager::ReadTupple(char **ptr) {
 	/* Error on partial data. */
 	if (!start || !end) return -1;
 	std::string value(start, end - start);
-	tp_data_.put(key, value);
+	AddToJSON(key, value);
 	*ptr = end;
 	return 0;
 }
 
 int DataManager::ReadRecord() {
 	if (!interface_) return -1;
-
-	tp_data_.clear();
 	if (interface_->ReadBlock() == 0) return -1;
 	try {
 		char *data = interface_->GetData();
 
+		/* Lock the JSON variable and update. */
+		boost::lock_guard<boost::mutex> lock(json_data_mutex_);
+		json_data_.clear();
+		json_data_.append("{");
+
 		/* Read until the stream is over or an error. */
 		while ((ReadTupple(&data) == 0) && (data));
 		if (data) {
-			tp_data_.put("VALID", "FALSE");
+			AddToJSON("VALID", false);
 		} else {
-			tp_data_.put("VALID", "TRUE");
+			AddToJSON("VALID", true);
 		}
-
-		std::stringstream ss;
-		PT::json_parser::write_json(ss, tp_data_);
-		/* Lock the JSON variable and update. */
-		boost::lock_guard<boost::mutex> lock(json_data_mutex_);
-		json_data_ = ss.str();
-
+		json_data_.append("\n}");
 		return 0;
 	} catch (...) {
 		return -1;
